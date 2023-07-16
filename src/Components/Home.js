@@ -1,25 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { useUserContext } from "./context/usercontext";
 
 function Home() {
-  const { AddtoTable, name, setName } = useUserContext();
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-    const newData = {
-      name,
-      email,
-      phone,
-    };
-    AddtoTable(newData);
-    console.log("data", newData);
-    setName("");
-    setEmail("");
-    setPhone("");
-  };
-
+  const { name, setName, email, setEmail, phone, setPhone, handleFormSubmit } =
+    useUserContext();
+  const formId = 11;
   return (
     <div className="container col-xl-10 col-xxl-8 px-4 ">
       <div className="row align-items-center g-lg-5">
@@ -32,7 +17,9 @@ function Home() {
         <div className="col-md-10 mx-auto col-lg-5">
           <form
             className="p-4 p-md-5 border rounded-3 bg-body-tertiary"
-            onSubmit={handleFormSubmit}
+            onSubmit={(e) =>
+              handleFormSubmit(e, { name, email, phone }, formId)
+            }
           >
             {/* Form inputs */}
             <div className="form-floating mb-3">
@@ -45,7 +32,7 @@ function Home() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
-              <label for="floatingInput">Name</label>
+              <label htmlFor="floatingInput">Name</label>
             </div>
             <div className="form-floating mb-3">
               <input
@@ -57,7 +44,7 @@ function Home() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-              <label for="floatingInput">Email</label>
+              <label htmlFor="floatingInput">Email</label>
             </div>
             <div className="form-floating mb-3">
               <input
@@ -69,7 +56,7 @@ function Home() {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
               />
-              <label for="floatingNumber">Phone Number</label>
+              <label htmlFor="floatingNumber">Phone Number</label>
             </div>
             <div className="checkbox mb-3">
               <label>

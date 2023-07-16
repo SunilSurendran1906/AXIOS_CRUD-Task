@@ -3,51 +3,29 @@ import { useUserContext } from "./context/usercontext";
 import axios from "axios";
 
 function ListPages() {
-  const { data, deleteData, setData } = useUserContext();
-  const [editingUser, setEditingUser] = useState(null);
+  const { data, handleDelete, handleUpdate } = useUserContext();
+  const [editingUserId, setEditingUserId] = useState(null);
+  const [updatedName, setUpdatedName] = useState("");
+  const [updatedEmail, setUpdatedEmail] = useState("");
+  const [updatedPhone, setUpdatedPhone] = useState("");
 
   const handleEditClick = (user) => {
-    setEditingUser(user);
+    setEditingUserId(user.id);
+    setUpdatedName(user.name);
+    setUpdatedEmail(user.email);
+    setUpdatedPhone(user.phone);
   };
 
-  const handleSaveClick = () => {
-    const {
-      id,
-      name: editedName,
-      email: editedEmail,
-      phone: editedPhone,
-    } = editingUser;
-
-    axios
-      .patch(`https://jsonplaceholder.typicode.com/users/${id}`, {
-        name: editedName,
-        email: editedEmail,
-        phone: editedPhone,
-      })
-      .then((res) => {
-        console.log(res);
-
-        const updatedData = data.map((user) =>
-          user.id === id
-            ? {
-                ...user,
-                name: editedName,
-                email: editedEmail,
-                phone: editedPhone,
-              }
-            : user
-        );
-        setData(updatedData);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
+  const handleEditSubmit = (e) => {
+    e.preventDefault();
+    if (editingUserId) {
+      handleUpdate(editingUserId, {
+        name: updatedName,
+        email: updatedEmail,
+        phone: updatedPhone,
       });
-
-    setEditingUser(null);
-  };
-
-  const handleCancelClick = () => {
-    setEditingUser(null);
+      setEditingUserId(null);
+    }
   };
 
   return (
@@ -63,97 +41,72 @@ function ListPages() {
           </tr>
         </thead>
         <tbody>
-          {data.map((user, index) => {
-            const isEditing = editingUser && editingUser.id === user.id;
-            return (
-              <tr key={index}>
-                <td>{index + 1}</td>
-                <td>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={editingUser.name}
-                      onChange={(e) =>
-                        setEditingUser({
-                          ...editingUser,
-                          name: e.target.value,
-                        })
-                      }
-                    />
-                  ) : (
-                    user.name
-                  )}
-                </td>
-                <td>
-                  {isEditing ? (
-                    <input
-                      type="email"
-                      value={editingUser.email}
-                      onChange={(e) =>
-                        setEditingUser({
-                          ...editingUser,
-                          email: e.target.value,
-                        })
-                      }
-                    />
-                  ) : (
-                    user.email
-                  )}
-                </td>
-                <td>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={editingUser.phone}
-                      onChange={(e) =>
-                        setEditingUser({
-                          ...editingUser,
-                          phone: e.target.value,
-                        })
-                      }
-                    />
-                  ) : (
-                    user.phone
-                  )}
-                </td>
-                <td>
-                  {isEditing ? (
-                    <>
-                      <button
-                        type="button"
-                        className="btn btn-success"
-                        onClick={handleSaveClick}
-                      >
-                        Save
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-secondary"
-                        onClick={handleCancelClick}
-                      >
-                        Cancel
-                      </button>
-                    </>
-                  ) : (
+          {data.map((user, index) => (
+            <tr key={index}>
+              <td>{index + 1}</td>
+              <td>
+                {editingUserId === user.id ? (
+                  <input
+                    type="text"
+                    value={updatedName}
+                    onChange={(e) => setUpdatedName(e.target.value)}
+                  />
+                ) : (
+                  user.name
+                )}
+              </td>
+              <td>
+                {editingUserId === user.id ? (
+                  <input
+                    type="email"
+                    value={updatedEmail}
+                    onChange={(e) => setUpdatedEmail(e.target.value)}
+                  />
+                ) : (
+                  user.email
+                )}
+              </td>
+              <td>
+                {editingUserId === user.id ? (
+                  <input
+                    type="text"
+                    value={updatedPhone}
+                    onChange={(e) => setUpdatedPhone(e.target.value)}
+                  />
+                ) : (
+                  user.phone
+                )}
+              </td>
+              <td>
+                {editingUserId === user.id ? (
+                  <button
+                    type="button"
+                    className="btn btn-success"
+                    onClick={handleEditSubmit}
+                  >
+                    Save
+                  </button>
+                ) : (
+                  <>
                     <button
                       type="button"
-                      className="btn btn-secondary"
+                      className="btn btn-primary me-2"
                       onClick={() => handleEditClick(user)}
                     >
                       Edit
                     </button>
-                  )}
-                  <button
-                    type="button"
-                    className="btn btn-danger"
-                    onClick={() => deleteData(user.id)}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            );
-          })}
+                    <button
+                      type="button"
+                      className="btn btn-danger"
+                      onClick={() => handleDelete(user.id)}
+                    >
+                      Delete
+                    </button>
+                  </>
+                )}
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
